@@ -1,46 +1,36 @@
 function calculadoraEqSegundoGrau() {
 
     const botaoNovaConta = document.querySelector('.nova-conta')
+    const p = document.querySelector('.resultado')
 
     botaoNovaConta.addEventListener('click', function() {
         location.reload()
     })
-
+    
     const valorA = Number(prompt('Digite o valor de A'))
     const valorB = Number(prompt('Digite o valor de B'))
     const valorC = Number(prompt('Digite o valor de C'))
-    let flag_a_e_c;
-    let flag_b;
 
-    function verificaValores(a, b, c) {
-        if (a < 0 || c < 0 ) {
-            flag_a_e_c = true
-        }
-        if (b < 0) {
-            flag_b = true
-        }
-        return {
-            'a_c_negativo': flag_a_e_c, 
-            'b_negativo': flag_b
+    if (isNaN(valorA) || isNaN(valorB) || isNaN(valorC)) {
+        erroDeConta('O valor é um não numérico.')
+    } else if (valorA === '' || valorB === '' || valorB === '') {
+        erroDeConta('Um ou mais valores não foram enviados.')
+    }
+
+    function estruturaDelta(a, b, c){
+        if (a < 0 || c < 0) {
+            return (b ** 2) + (4 * a * c)
+        } else if (a > 0 || c > 0) {
+            return (b ** 2) - (4 * a * c)
+        } else {
+            return 'Você digitou algo inválido.'
         }
     }
 
-    function verificaDelta(a, b, c){
-        const valorVerificado = verificaValores(a, b, c)
-        const ladoEsquerdo = !valorVerificado.b_negativo ? 0-b**2 : b**2
-        const ladoDireito = valorVerificado.a_c_negativo ? - (4 * a * c) : + (4 * a * c)
-        return {
-            'ladoEsquerdo': ladoEsquerdo,
-            'ladoDireito': ladoDireito,
-        }
-    }
+    function calculaDelta(estruturaConta) {
+        const raizDelta = Math.sqrt(estruturaConta)
 
-    function calculaDelta(ladoEsquerdo, ladoDireito) {
-        const valorDelta = ladoEsquerdo + ladoDireito
-
-        const raizDelta = Math.sqrt(valorDelta)
-
-        if (!raizDelta) return mostraResultado(false)
+        if (!raizDelta && raizDelta !== 0) return erroDeConta(`O valor da raiz quadrada é menor que zero, não há resultados válidos.`)
         return raizDelta
     }
 
@@ -51,10 +41,10 @@ function calculadoraEqSegundoGrau() {
             if (valorDelta !== 0) {
                 if (i === 1) {
                     let valorDeX = (-b + valorDelta) / (2 * a)
-                    conjuntoSolucao.push(valorDeX)
+                    conjuntoSolucao.push(valorDeX.toFixed(2))
                 } else if (i === 2) {
                     let valorDeX = (-b - valorDelta) / (2 * a)
-                    conjuntoSolucao.push(valorDeX)
+                    conjuntoSolucao.push(valorDeX.toFixed(2))
                 }
             } else {
                 let valorDeX = (-b + valorDelta) / (2 * a)
@@ -66,8 +56,12 @@ function calculadoraEqSegundoGrau() {
         return conjuntoSolucao
     }
 
+    function erroDeConta(error) {
+        p.innerText = error
+        throw Error
+    }
+
     function mostraResultado(conjuntoSolucao) {
-        const p = document.querySelector('.resultado')
         if (conjuntoSolucao) {
             template = `O resultado para os valores a=${valorA}, b=${valorB} e c=${valorC} foi:
                 ${conjuntoSolucao}
@@ -79,8 +73,8 @@ function calculadoraEqSegundoGrau() {
         }
     }
 
-    const ladosEquacao = verificaDelta(valorA, valorB, valorC)
-    const raizDelta = calculaDelta(ladosEquacao.ladoEsquerdo, ladosEquacao.ladoDireito)
+    const equacaoDelta = estruturaDelta(valorA, valorB, valorC)
+    const raizDelta = calculaDelta(equacaoDelta)
     const conjuntoSolucao = calculaValoresDeX(raizDelta, valorA, valorB)
     mostraResultado(conjuntoSolucao)
 }
